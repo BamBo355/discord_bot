@@ -15,7 +15,7 @@ client.once('ready', () => {
   } else {
     console.error("❌ Không tìm thấy channel. Kiểm tra lại CHANNEL_ID.");
   }
-
+  
   setInterval(async () => {
     try {
       const cpuLoad = (await si.currentLoad()).currentLoad;
@@ -41,4 +41,4 @@ client.once('ready', () => {
   }, 60 * 1000); // kiểm tra mỗi phút
 
 });
-client.login(process.env.BOT_TOKEN);
+client.login(process.env.DISCORD_TOKEN);
