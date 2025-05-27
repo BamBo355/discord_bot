@@ -1,10 +1,10 @@
+require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
-const os = require('os');
+const si = require('systeminformation');
 
-const TOKEN = process.env.DISCORD_TOKEN;
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
 const CHANNEL_ID = process.env.CHANNEL_ID;
-
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 
 client.once('ready', () => {
   console.log(`✅ Bot online: ${client.user.tag}`);
@@ -16,19 +16,29 @@ client.once('ready', () => {
     console.error("❌ Không tìm thấy channel. Kiểm tra lại CHANNEL_ID.");
   }
 
-  setInterval(() => {
-    const totalMem = os.totalmem() / (1024 * 1024);
-    const freeMem = os.freemem() / (1024 * 1024);
-    const usedMem = totalMem - freeMem;
-    const load = os.loadavg()[0];
+  setInterval(async () => {
+    try {
+      const cpuLoad = (await si.currentLoad()).currentLoad;
+      const mem = await si.mem();
+      const disk = await si.fsSize();
 
-    const msg = `📊 **VPS Monitor**
-- CPU Load (1min): ${load.toFixed(2)}
-- RAM Used: ${usedMem.toFixed(1)} MB / ${totalMem.toFixed(1)} MB`;
+      const ramUsage = (mem.used / mem.total) * 100;
+      const diskUsage = disk[0].use; // % disk usage
 
-    const channel = client.channels.cache.get(CHANNEL_ID);
-    if (channel) channel.send(msg);
-  }, 60000); // mỗi 60 giây
+      const warnings = [];
+
+      if (cpuLoad > 80) warnings.push(`🔥 CPU cao: ${cpuLoad.toFixed(2)}%`);
+      if (ramUsage > 90) warnings.push(`💾 RAM cao: ${ramUsage.toFixed(2)}%`);
+      if (diskUsage > 90) warnings.push(`🗄️ Ổ đĩa đầy: ${diskUsage.toFixed(2)}%`);
+
+      if (warnings.length > 0 && channel) {
+        const alert = `🚨 *Cảnh báo hệ thống VPS:*\n` + warnings.join('\n');
+        channel.send(alert);
+      }
+    } catch (err) {
+      console.error("Lỗi khi lấy thông tin hệ thống:", err);
+    }
+  }, 60 * 1000); // kiểm tra mỗi phút
+
 });
-
-client.login(TOKEN);
+client.login(process.env.BOT_TOKEN);
