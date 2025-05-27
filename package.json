@@ -1,0 +1,11 @@
+{
+  "name": "discord-monitor-bot",
+  "version": "1.0.0",
+  "main": "monitor-bot.js",
+  "scripts": {
+    "start": "node monitor-bot.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.0.0"
+  }
+}
