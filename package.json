@@ -6,6 +6,7 @@
     "start": "node monitor-bot.js"
   },
   "dependencies": {
-    "discord.js": "^14.0.0"
+    "discord.js": "^14.x",
+    "systeminformation": "^5.x"
   }
 }
