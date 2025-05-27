@@ -9,6 +9,13 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 client.once('ready', () => {
   console.log(`✅ Bot online: ${client.user.tag}`);
 
+  const channel = client.channels.cache.get(CHANNEL_ID);
+  if (channel) {
+    channel.send("✅ Bot đã kết nối và sẵn sàng giám sát VPS!");
+  } else {
+    console.error("❌ Không tìm thấy channel. Kiểm tra lại CHANNEL_ID.");
+  }
+
   setInterval(() => {
     const totalMem = os.totalmem() / (1024 * 1024);
     const freeMem = os.freemem() / (1024 * 1024);
